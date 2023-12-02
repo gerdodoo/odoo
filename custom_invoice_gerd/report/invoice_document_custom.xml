@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_invoice_document_custom" inherit_id="account.report_invoice_document">
+
+            <!-- Ocultar la columna Taxes -->
+            <xpath expr="//th[@name='th_taxes']" position="replace"/>
+            <xpath expr="//td[@name='td_taxes']" position="replace"/>
+
+            <!-- Modificar el tamaño de la letra en la columna Description -->
+            <xpath expr="//td[@name='account_invoice_line_name']" position="attributes">
+                <attribute name="style">font-size: 13px;</attribute>
+            </xpath>
+
+            <!-- Modificar el ancho de la columna Description -->
+            <xpath expr="//th[@name='th_description']" position="attributes">
+                <attribute name="style">width: 50%;</attribute>
+            </xpath>
+
+            <!-- Ajustar el ancho de las demás columnas -->
+            <xpath expr="//th[not(@name='th_description')]" position="attributes">
+                <attribute name="style">width: calc(50% / 5);</attribute>
+            </xpath>
+
+            <!--Oculta los totales originales del reporte-->
+            <xpath expr="//div[@id='right-elements']" position="replace">
+                <!--DEJAR VACIO-->
+            </xpath>
+            <!-- Agrega la sección para imprimir los impuestos uno por uno -->
+            <xpath expr="//table[@name='invoice_line_table']" position="after">
+                <div class="row">
+                    <div t-attf-class="#{'col-6 text-end' if report_type != 'html' else 'col-sm-7 col-md-6 ml-auto'}"></div>
+                    <div t-attf-class="#{'col-6 text-end' if report_type != 'html' else 'col-sm-7 col-md-6 ml-auto'}">
+                        <table class="table table-condensed table-borderless">
+
+                            <tbody>
+                                <tr style="border-top:1px solid black;">
+                                    <td style="padding:2px;">Subtotal</td>
+                                    <td style="padding:2px;text-align:right;">
+                                    $                                        <span t-esc="sum(line.price_subtotal for line in o.invoice_line_ids)" t-options='{"widget": "float", "precision": 2, "separator": ",", "thousands_sep": " "}'/>
+                                    </td>
+                                </tr>
+                                <!-- Itera sobre las líneas de la factura para obtener los impuestos -->
+                                <t t-foreach="o.invoice_line_ids" t-as="line">
+                                    <!-- Verifica si la línea tiene impuestos -->
+                                    <t t-if="line.tax_ids">
+                                        <!-- Itera sobre los impuestos aplicados a la línea -->
+                                        <t t-foreach="line.tax_ids" t-as="tax">
+                                            <tr>
+                                                <td style="padding:2px;">
+                                                    <span t-field="tax.name" />
+                                                </td>
+                                                <td style="padding:2px;text-align:right;">$                                                    <span t-esc="line.price_subtotal * (tax.amount/100)" t-options='{"widget": "float", "precision": 2, "separator": ",", "thousands_sep": " "}'/>
+                                                </td>
+                                            </tr>
+                                            <!-- Si es el primer impuesto -->
+                                            <t t-if="tax == line.tax_ids[0]">
+                                                <tr>
+                                                    <td style="padding:2px;">Subtotal</td>
+                                                    <td style="padding:2px;text-align:right;">$                                                        <span t-esc="(sum(line.price_subtotal for line in o.invoice_line_ids) + line.price_subtotal * (tax.amount/100))" t-options='{"widget": "float", "precision": 2, "separator": ",", "thousands_sep": " "}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </t>
+                                <tr style="border-top:1px solid black;">
+                                    <td style="padding:2px;">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td style="padding:2px;text-align:right;">
+                                    $                                        <span t-esc="(sum(line.price_subtotal for line in o.invoice_line_ids) + sum(line.price_subtotal * (tax.amount/100) for line in o.invoice_line_ids for tax in line.tax_ids))" t-options='{"widget": "float", "precision": 2, "separator": ",", "thousands_sep": " "}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+    </data>
+</odoo>
