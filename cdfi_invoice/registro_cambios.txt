@@ -1,0 +1,15 @@
+v17.05
+-Cancelación rechazada si está vacío el estado de cancelación.
+
+v17.04
+-Corrección en PDF de factura para agregar importe
+
+v17.03
+-Corrección para adjuntar el XML en correo de pago
+
+v17.02
+-Se hicieron ajustes para el timbrado de pagos 2.0B
+
+v17.01
+-Version no para producción.
+-No adjunta XML en correo de pagos.
