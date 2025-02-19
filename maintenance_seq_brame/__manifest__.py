@@ -32,7 +32,7 @@
     'depends': ['maintenance'],
     'data': [
         'data/equipment_sequence.xml',
-        'views/view_equipment_form',
+        'views/view_equipment_form.xml',
     ],
     'license': 'AGPL-3',
     'installable': True,
