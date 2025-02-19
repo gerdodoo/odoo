@@ -3,7 +3,7 @@ from odoo import models, fields, api
 class MaintenanceEquipment(models.Model):
     _inherit = 'maintenance.equipment'
 
-    sequence = fields.Char(string='Referencia', required=True, copy=False, readonly=True, default=lambda self: self._get_next_sequence())
+    sequence = fields.Char(string='Referencia', required=True, copy=False, readonly=True)
 
     @api.model
     def _get_next_sequence(self):
