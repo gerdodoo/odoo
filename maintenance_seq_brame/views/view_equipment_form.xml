@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
         <field name="arch" type="xml">
             <!-- Añadir el campo sequence en la vista -->
-            <xpath expr="//group//field[@name='name']" position="before">
+            <xpath expr="//field[@name='name']" position="before">
                 <field name="sequence" readonly="1" />
             </xpath>
         </field>
