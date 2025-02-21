@@ -15,6 +15,7 @@
                 <field name="quantity" />
                 <field name="price_average" />
                 <field name="price_subtotal" />
+                <field name="analytic_account_id" /> <!-- 🔹 Se añade este campo -->                 
                 <field name="company_currency_id" invisible="1" />
             </tree>
         </field>
