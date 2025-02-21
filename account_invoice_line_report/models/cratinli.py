@@ -10,6 +10,3 @@ class AccountInvoiceReport(models.Model):
 
     def _select(self):
         return super()._select() + ", line.analytic_distribution as analytic_distribution"
-
-    def _group_by(self):
-        return super()._group_by() + ", line.analytic_distribution"
