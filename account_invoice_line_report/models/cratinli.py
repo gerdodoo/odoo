@@ -3,7 +3,7 @@ from odoo import models, fields
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    analytic_account_id = fields.Many2one(
+    analytic_account_id = fields.Text(
         comodel_name="analytic.distribution",
         string="Cuenta Analítica",
     )
