@@ -3,9 +3,9 @@ from odoo import models, fields
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    analytic_account_id = fields.Text(
-        comodel_name="analytic.distribution",
-        string="Cuenta Analítica",
+    analytic_distribution = fields.Text(
+        string="Distribución Analítica",
+        readonly=True
     )
 
     def _select(self):
