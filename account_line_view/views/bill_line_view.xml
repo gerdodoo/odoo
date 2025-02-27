@@ -11,7 +11,7 @@
                 <field name="partner_id"/>
                 <field name="name"/>
                 <field name="account_id"/>
-                <field name="analytic_account_id"/>  <!-- Agregado -->                
+                <field name="analytic_account_code"/>  <!-- Nuevo campo -->                
                 <field name="quantity"/>
                 <field name="product_uom_id" optional="hide"/>
                 <field name="price_unit"/>
