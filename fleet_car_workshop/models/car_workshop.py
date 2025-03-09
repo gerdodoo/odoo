@@ -32,14 +32,15 @@ class CarWorkshop(models.Model):
     _inherit = ['mail.thread']
 
 
-        def action_open_stock_picking_wizard(self):
-        """ Abre el wizard para crear stock picking """
+    def action_open_stock_picking_wizard(self):
+        """ Método para abrir el asistente de Stock Picking """
         return {
+            'name': 'Generar Stock Picking',
             'type': 'ir.actions.act_window',
-            'name': 'Crear Stock Picking',
             'res_model': 'stock.picking.wizard',
             'view_mode': 'form',
             'target': 'new',
+        }
             'context': {
                 'default_workshop_id': self.id,
                 'default_picking_type_id': self.env['stock.picking.type'].search([], limit=1).id,
