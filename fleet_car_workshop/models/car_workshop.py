@@ -31,6 +31,23 @@ class CarWorkshop(models.Model):
     _description = "Car Workshop"
     _inherit = ['mail.thread']
 
+
+        def action_open_stock_picking_wizard(self):
+        """ Abre el wizard para crear stock picking """
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Crear Stock Picking',
+            'res_model': 'stock.picking.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_workshop_id': self.id,
+                'default_picking_type_id': self.env['stock.picking.type'].search([], limit=1).id,
+                'default_location_id': self.env['stock.location'].search([('usage', '=', 'internal')], limit=1).id,
+                'default_location_dest_id': self.env['stock.location'].search([('usage', '=', 'customer')], limit=1).id,
+            },
+        }
+            
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         """ Read group customization in order to display all the stages in the
