@@ -34,9 +34,9 @@
         </record>
 
         <!-- Menú dentro de Flota -->
-        <menuitem id="menu_res_distrito_root"
+        <menuitem id="menu_res_distrito"
                   name="Distritos"
-                  parent="fleet.fleet_menu_root"
+                  parent="fleet.menu_fleet_configuration"
                   sequence="100"
                   action="action_res_distrito"/>
     </data>
