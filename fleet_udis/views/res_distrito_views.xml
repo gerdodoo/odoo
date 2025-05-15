@@ -1,5 +1,6 @@
 <odoo>
     <data>
+        <!-- Vista de formulario -->
         <record id="view_res_distrito_form" model="ir.ui.view">
             <field name="name">res.distrito.form</field>
             <field name="model">res.distrito</field>
@@ -14,23 +15,28 @@
             </field>
         </record>
 
+        <!-- Vista de lista -->
         <record id="view_res_distrito_tree" model="ir.ui.view">
             <field name="name">res.distrito.tree</field>
             <field name="model">res.distrito</field>
             <field name="arch" type="xml">
-                <tree string="Distrito">
+                <tree string="Distritos">
                     <field name="name"/>
                 </tree>
             </field>
         </record>
 
+        <!-- Acción para abrir la vista -->
         <record id="action_res_distrito" model="ir.actions.act_window">
             <field name="name">Distritos</field>
             <field name="res_model">res.distrito</field>
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem id="menu_res_distrito_root" name="Distritos"/>
+        <!-- Menú principal -->
+        <menuitem id="menu_res_distrito_root" name="Distritos" sequence="100"/>
+
+        <!-- Submenú con acción -->
         <menuitem id="menu_res_distrito" name="Registros" parent="menu_res_distrito_root" action="action_res_distrito"/>
     </data>
 </odoo>
