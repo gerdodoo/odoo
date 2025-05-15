@@ -26,17 +26,18 @@
             </field>
         </record>
 
-        <!-- Acción para abrir la vista -->
+        <!-- Acción -->
         <record id="action_res_distrito" model="ir.actions.act_window">
             <field name="name">Distritos</field>
             <field name="res_model">res.distrito</field>
             <field name="view_mode">tree,form</field>
         </record>
 
-        <!-- Menú principal -->
-        <menuitem id="menu_res_distrito_root" name="Distritos" sequence="100"/>
-
-        <!-- Submenú con acción -->
-        <menuitem id="menu_res_distrito" name="Registros" parent="menu_res_distrito_root" action="action_res_distrito"/>
+        <!-- Menú dentro de Flota -->
+        <menuitem id="menu_res_distrito_root"
+                  name="Distritos"
+                  parent="fleet.fleet_menu_root"
+                  sequence="100"
+                  action="action_res_distrito"/>
     </data>
 </odoo>
