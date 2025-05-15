@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <field name="manager_id" position="after">
                     <field name="ubicacion"/>
-                    <field name="distrito"/>
+                    <field name="distrito_id"/>
                 </field>
             </field>
         </record>
