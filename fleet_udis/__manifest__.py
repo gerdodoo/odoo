@@ -8,6 +8,7 @@
     'depends': ['fleet'],
     'data': [
         'views/ubicacion_distrito_views.xml',
+        'views/res_distrito_views.xml',        
     ],
     'installable': True,
     'application': False,
