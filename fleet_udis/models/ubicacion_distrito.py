@@ -1,0 +1,85 @@
+from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+
+class FleetVehicle(models.Model):
+    _inherit = 'fleet.vehicle'
+
+    ubicacion = fields.Selection([
+        ('PANTITLAN', 'Pantitlan'),
+        ('TEXCOCO', 'Texcoco'),
+        ('COACALCO', 'Coacalco'),
+        ('LAGO_LADOGA', 'Lago Ladoga'),
+        ('GANADEROS', 'Ganaderos'),
+        ('TOLUCA', 'Toluca'),
+        ('QUERETARO', 'Queretaro'),
+        ('CELAYA', 'Celaya'),
+        ('GUADALAJARA', 'Guadalajara'),
+        ('PUERTO_VALLARTA', 'Puerto Vallarta'),
+        ('AGUASCALIENTES', 'Aguascalientes'),
+        ('PUEBLA', 'Puebla'),
+    ], string='Ubicación')
+
+    distrito = fields.Selection([
+        ('NEZA', 'Neza'),
+        ('AEROPUERTO', 'Aeropuerto'),
+        ('LOS_REYES', 'Los Reyes'),
+        ('TEXCOCO', 'Texcoco'),
+        ('TULTITLAN', 'Tultitlan'),
+        ('HUEHUETOCA', 'Huehuetoca'),
+        ('SANTA_FE', 'Santa Fe'),
+        ('CONDESA', 'Condesa'),
+        ('LAS_AGUILAS', 'Las Aguilas'),
+        ('PEDREGAL', 'Pedregal'),
+        ('TLALPAN', 'Tlalpan'),
+        ('LERMA', 'Lerma'),
+        ('METEPEC', 'Metepec'),
+        ('QUERETARO', 'Queretaro'),
+        ('CELAYA', 'Celaya'),
+        ('GUADALAJARA', 'Guadalajara'),
+        ('PUERTO_VALLARTA', 'Puerto Vallarta'),
+        ('AGUASCALIENTES', 'Aguascalientes'),
+        ('ANGELOPOLIS', 'Angelopolis'),
+    ], string='Distrito')
+
+    @api.onchange('ubicacion')
+    def _onchange_ubicacion(self):
+        mapping = {
+            'PANTITLAN': ['NEZA', 'AEROPUERTO', 'LOS_REYES'],
+            'TEXCOCO': ['TEXCOCO'],
+            'COACALCO': ['TULTITLAN', 'HUEHUETOCA'],
+            'LAGO_LADOGA': ['SANTA_FE', 'CONDESA'],
+            'GANADEROS': ['LAS_AGUILAS', 'PEDREGAL', 'TLALPAN'],
+            'TOLUCA': ['LERMA', 'METEPEC'],
+            'QUERETARO': ['QUERETARO'],
+            'CELAYA': ['CELAYA'],
+            'GUADALAJARA': ['GUADALAJARA'],
+            'PUERTO_VALLARTA': ['PUERTO_VALLARTA'],
+            'AGUASCALIENTES': ['AGUASCALIENTES'],
+            'PUEBLA': ['ANGELOPOLIS'],
+        }
+        distritos = mapping.get(self.ubicacion, [])
+        return {'domain': {'distrito': [('distrito', 'in', distritos)]}}
+
+    @api.constrains('ubicacion', 'distrito')
+    def _check_distrito_valido(self):
+        mapping = {
+            'PANTITLAN': ['NEZA', 'AEROPUERTO', 'LOS_REYES'],
+            'TEXCOCO': ['TEXCOCO'],
+            'COACALCO': ['TULTITLAN', 'HUEHUETOCA'],
+            'LAGO_LADOGA': ['SANTA_FE', 'CONDESA'],
+            'GANADEROS': ['LAS_AGUILAS', 'PEDREGAL', 'TLALPAN'],
+            'TOLUCA': ['LERMA', 'METEPEC'],
+            'QUERETARO': ['QUERETARO'],
+            'CELAYA': ['CELAYA'],
+            'GUADALAJARA': ['GUADALAJARA'],
+            'PUERTO_VALLARTA': ['PUERTO_VALLARTA'],
+            'AGUASCALIENTES': ['AGUASCALIENTES'],
+            'PUEBLA': ['ANGELOPOLIS'],
+        }
+        for record in self:
+            if record.distrito and record.ubicacion:
+                distritos_validos = mapping.get(record.ubicacion, [])
+                if record.distrito not in distritos_validos:
+                    raise ValidationError(
+                        f"El distrito '{record.distrito}' no es válido para la ubicación '{record.ubicacion}'."
+                    )
