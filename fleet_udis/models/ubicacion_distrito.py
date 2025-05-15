@@ -19,27 +19,7 @@ class FleetVehicle(models.Model):
         ('PUEBLA', 'Puebla'),
     ], string='Ubicación')
 
-    distrito = fields.Selection([
-        ('NEZA', 'Neza'),
-        ('AEROPUERTO', 'Aeropuerto'),
-        ('LOS_REYES', 'Los Reyes'),
-        ('TEXCOCO', 'Texcoco'),
-        ('TULTITLAN', 'Tultitlan'),
-        ('HUEHUETOCA', 'Huehuetoca'),
-        ('SANTA_FE', 'Santa Fe'),
-        ('CONDESA', 'Condesa'),
-        ('LAS_AGUILAS', 'Las Aguilas'),
-        ('PEDREGAL', 'Pedregal'),
-        ('TLALPAN', 'Tlalpan'),
-        ('LERMA', 'Lerma'),
-        ('METEPEC', 'Metepec'),
-        ('QUERETARO', 'Queretaro'),
-        ('CELAYA', 'Celaya'),
-        ('GUADALAJARA', 'Guadalajara'),
-        ('PUERTO_VALLARTA', 'Puerto Vallarta'),
-        ('AGUASCALIENTES', 'Aguascalientes'),
-        ('ANGELOPOLIS', 'Angelopolis'),
-    ], string='Distrito')
+    distrito_id = fields.Many2one('res.distrito', string='Distrito')
 
     @api.onchange('ubicacion')
     def _onchange_ubicacion(self):
@@ -58,9 +38,9 @@ class FleetVehicle(models.Model):
             'PUEBLA': ['ANGELOPOLIS'],
         }
         distritos = mapping.get(self.ubicacion, [])
-        return {'domain': {'distrito': [('distrito', 'in', distritos)]}}
+        return {'domain': {'distrito_id': [('name', 'in', distritos)]}}
 
-    @api.constrains('ubicacion', 'distrito')
+    @api.constrains('ubicacion', 'distrito_id')
     def _check_distrito_valido(self):
         mapping = {
             'PANTITLAN': ['NEZA', 'AEROPUERTO', 'LOS_REYES'],
@@ -77,9 +57,9 @@ class FleetVehicle(models.Model):
             'PUEBLA': ['ANGELOPOLIS'],
         }
         for record in self:
-            if record.distrito and record.ubicacion:
+            if record.distrito_id and record.ubicacion:
                 distritos_validos = mapping.get(record.ubicacion, [])
-                if record.distrito not in distritos_validos:
+                if record.distrito_id.name not in distritos_validos:
                     raise ValidationError(
-                        f"El distrito '{record.distrito}' no es válido para la ubicación '{record.ubicacion}'."
+                        f"El distrito '{record.distrito_id.name}' no es válido para la ubicación '{record.ubicacion}'."
                     )
