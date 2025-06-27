@@ -41,6 +41,8 @@ class PurchaseRequest(models.Model):
 
 # En models/purchase_request.py
 
+# En models/purchase_request.py
+
 @api.model_create_multi
 def create(self, vals_list):
     for vals in vals_list:
@@ -48,25 +50,20 @@ def create(self, vals_list):
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
             vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
         
-        # --- LÓGICA DE DEPARTAMENTO MODIFICADA Y MÁS ROBUSTA ---
-        # Si el departamento no viene en los valores y hay un solicitante...
+        # --- LÓGICA DE DEPARTAMENTO CON SUDO() PARA BYPASS DE REGLAS DE ACCESO ---
         if not vals.get('department_id') and vals.get('requester_id'):
-            # Obtenemos el ID del usuario solicitante
             user_id = vals.get('requester_id')
             
-            # Buscamos explícitamente en el modelo 'hr.employee' al empleado
-            # que esté vinculado con este user_id.
-            # Usamos sudo() para buscar en todas las compañías sin problemas de permisos,
-            # ya que la regla del empleado podría restringir la visibilidad.
-            # `search_count` es más rápido si solo queremos verificar.
-            # Vamos a buscar directamente el empleado.
+            # Usamos sudo() para que la búsqueda se ejecute con permisos de administrador.
+            # Esto permite encontrar al empleado incluso si está en una compañía diferente
+            # a la que el usuario está usando actualmente, saltando las reglas de acceso
+            # que podrían impedirlo.
             
-            Employee = self.env['hr.employee']
-            # Buscamos sin restricciones de compañía para encontrar el registro del empleado donde sea que esté.
+            Employee = self.env['hr.employee'].sudo() # <-- ¡LA CLAVE ESTÁ AQUÍ!
+            
             employee = Employee.search([('user_id', '=', user_id)], limit=1)
             
             if employee and employee.department_id:
-                # Si encontramos un empleado y tiene un departamento, lo asignamos.
                 vals['department_id'] = employee.department_id.id
     
     return super(PurchaseRequest, self).create(vals_list)
