@@ -15,9 +15,10 @@ class PurchaseRequest(models.Model):
         'res.users', string='Solicitante', required=True, index=True,
         default=lambda self: self.env.user, tracking=True
     )
+    # Dejamos el campo editable como solicitaste
     department_id = fields.Many2one(
         'hr.department', string='Departamento Solicitante',
-        store=True, index=True, tracking=True # <-- Se eliminó readonly=True
+        store=True, index=True, tracking=True
     )
     company_id = fields.Many2one(
         'res.company', string='Compañía', required=True,
@@ -39,34 +40,15 @@ class PurchaseRequest(models.Model):
         ('rejected', 'Rechazado'),
     ], string='Estado', default='draft', tracking=True)
 
-# En models/purchase_request.py
-
-# En models/purchase_request.py
-
-@api.model_create_multi
-def create(self, vals_list):
-    for vals in vals_list:
-        # Asignar número de secuencia
-        if vals.get('name', _('Nuevo')) == _('Nuevo'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
+    # --- MÉTODO CREATE CON LA LÓGICA DE SECUENCIA ---
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', _('Nuevo')) == _('Nuevo'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
         
-        # --- LÓGICA DE DEPARTAMENTO CON SUDO() PARA BYPASS DE REGLAS DE ACCESO ---
-        if not vals.get('department_id') and vals.get('requester_id'):
-            user_id = vals.get('requester_id')
-            
-            # Usamos sudo() para que la búsqueda se ejecute con permisos de administrador.
-            # Esto permite encontrar al empleado incluso si está en una compañía diferente
-            # a la que el usuario está usando actualmente, saltando las reglas de acceso
-            # que podrían impedirlo.
-            
-            Employee = self.env['hr.employee'].sudo() # <-- ¡LA CLAVE ESTÁ AQUÍ!
-            
-            employee = Employee.search([('user_id', '=', user_id)], limit=1)
-            
-            if employee and employee.department_id:
-                vals['department_id'] = employee.department_id.id
-    
-    return super(PurchaseRequest, self).create(vals_list)
+        return super(PurchaseRequest, self).create(vals_list)
+
 
 class PurchaseRequestLine(models.Model):
     _name = 'purchase.request.line'
@@ -83,5 +65,11 @@ class PurchaseRequestLine(models.Model):
     quantity = fields.Float('Cantidad', default=1.0, required=True)
     product_uom_id = fields.Many2one(
         'uom.uom', string='Unidad de Medida',
-        related='product_id.uom_po_id' # Unidad de medida de compra del producto
+        related='product_id.uom_po_id'
     )
+
+    # --- MÉTODO ONCHANGE PARA LA DESCRIPCIÓN ---
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.description = self.product_id.display_name
