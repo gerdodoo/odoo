@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="purchase_order_auto_department_action" model="ir.actions.server">
+        <field name="name">Asignar Departamento Automáticamente</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if not record.department_id:
+    allowed_departments = user.allowed_department_ids
+    if allowed_departments:
+        if len(allowed_departments) == 1:
+            record.department_id = allowed_departments[0].id
+        else:
+            raise UserError("Tienes múltiples departamentos asignados. Por favor selecciona manualmente el departamento correspondiente en la orden de compra.")
+        ]]></field>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_type">on_create</field>
+    </record>
+</odoo>
