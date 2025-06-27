@@ -39,19 +39,37 @@ class PurchaseRequest(models.Model):
         ('rejected', 'Rechazado'),
     ], string='Estado', default='draft', tracking=True)
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if vals.get('name', _('Nuevo')) == _('Nuevo'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
-            
-            # Asignación robusta de departamento en multi-compañía
-            user = self.env['res.users'].browse(vals.get('requester_id', self.env.uid))
-            # Usamos employee_ids para buscar en todas las compañías permitidas
-            if not vals.get('department_id') and user.employee_ids:
-                vals['department_id'] = user.employee_ids[0].department_id.id
+# En models/purchase_request.py
+
+@api.model_create_multi
+def create(self, vals_list):
+    for vals in vals_list:
+        # Asignar número de secuencia
+        if vals.get('name', _('Nuevo')) == _('Nuevo'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
         
-        return super(PurchaseRequest, self).create(vals_list)
+        # --- LÓGICA DE DEPARTAMENTO MODIFICADA Y MÁS ROBUSTA ---
+        # Si el departamento no viene en los valores y hay un solicitante...
+        if not vals.get('department_id') and vals.get('requester_id'):
+            # Obtenemos el ID del usuario solicitante
+            user_id = vals.get('requester_id')
+            
+            # Buscamos explícitamente en el modelo 'hr.employee' al empleado
+            # que esté vinculado con este user_id.
+            # Usamos sudo() para buscar en todas las compañías sin problemas de permisos,
+            # ya que la regla del empleado podría restringir la visibilidad.
+            # `search_count` es más rápido si solo queremos verificar.
+            # Vamos a buscar directamente el empleado.
+            
+            Employee = self.env['hr.employee']
+            # Buscamos sin restricciones de compañía para encontrar el registro del empleado donde sea que esté.
+            employee = Employee.search([('user_id', '=', user_id)], limit=1)
+            
+            if employee and employee.department_id:
+                # Si encontramos un empleado y tiene un departamento, lo asignamos.
+                vals['department_id'] = employee.department_id.id
+    
+    return super(PurchaseRequest, self).create(vals_list)
 
 class PurchaseRequestLine(models.Model):
     _name = 'purchase.request.line'
