@@ -7,6 +7,7 @@
     "data": [
         "security/ir.model.access.csv",
         "security/purchase_department_rules.xml",
+        "data/purchase_order_auto_department.xml",
     ],
     "installable": True,
     "application": False,
