@@ -17,7 +17,7 @@ class PurchaseRequest(models.Model):
     )
     department_id = fields.Many2one(
         'hr.department', string='Departamento Solicitante',
-        store=True, readonly=True, index=True, tracking=True
+        store=True, index=True, tracking=True # <-- Se eliminó readonly=True
     )
     company_id = fields.Many2one(
         'res.company', string='Compañía', required=True,
