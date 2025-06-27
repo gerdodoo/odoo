@@ -1,7 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
-
         <!-- Vista de Formulario (Form) -->
         <record id="purchase_request_form_view" model="ir.ui.view">
             <field name="name">purchase.request.form</field>
@@ -9,10 +5,25 @@
             <field name="arch" type="xml">
                 <form string="Solicitud de Compra">
                     <header>
-                        <!-- Aquí puedes añadir botones para el flujo de aprobación -->
-                        <field name="state" widget="statusbar" statusbar_visible="draft,approved,done"/>
+                        <!-- Botón para enviar a aprobación, visible solo en estado Borrador -->
+                        <button name="action_submit" string="Enviar a Aprobación" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        
+                        <!-- Botones para el Gerente de Compras, visibles solo en estado Para Aprobar -->
+                        <button name="action_approve" string="Aprobar" type="object" class="oe_highlight"
+                                attrs="{'invisible': [('state', '!=', 'to_approve')]}" groups="purchase.group_purchase_manager"/>
+                        <button name="action_reject" string="Rechazar" type="object"
+                                attrs="{'invisible': [('state', '!=', 'to_approve')]}" groups="purchase.group_purchase_manager"/>
+                        
+                        <!-- Botón para restablecer a borrador, visible para el Gerente -->
+                        <button name="action_set_to_draft" string="Restablecer a Borrador" type="object"
+                                attrs="{'invisible': [('state', 'not in', ['approved', 'rejected'])]}" groups="purchase.group_purchase_manager"/>
+
+                        <!-- La barra de estado -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,done"/>
                     </header>
                     <sheet>
+                        <!-- ... (el resto de tu sheet se mantiene igual: oe_title, group, notebook, etc.) ... -->
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -49,43 +60,3 @@
                 </form>
             </field>
         </record>
-
-        <!-- Vista de Árbol (Tree) -->
-        <record id="purchase_request_tree_view" model="ir.ui.view">
-            <field name="name">purchase.request.tree</field>
-            <field name="model">purchase.request</field>
-            <field name="arch" type="xml">
-                <tree string="Solicitudes de Compra">
-                    <field name="name"/>
-                    <field name="requester_id"/>
-                    <field name="department_id"/>
-                    <field name="request_date"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="state" widget="badge"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- Vista de Búsqueda (Search) -->
-        <record id="purchase_request_search_view" model="ir.ui.view">
-            <field name="name">purchase.request.search</field>
-            <field name="model">purchase.request</field>
-            <field name="arch" type="xml">
-                <search string="Buscar Solicitudes de Compra">
-                    <field name="name"/>
-                    <field name="requester_id"/>
-                    <field name="department_id"/>
-                    <separator/>
-                    <filter string="Mis Solicitudes" name="my_requests" domain="[('requester_id', '=', uid)]"/>
-                    <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
-                    <group expand="0" string="Agrupar por">
-                        <filter string="Solicitante" name="group_by_requester" context="{'group_by': 'requester_id'}"/>
-                        <filter string="Departamento" name="group_by_department" context="{'group_by': 'department_id'}"/>
-                        <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
-                    </group>
-                </search>
-            </field>
-        </record>
-
-    </data>
-</odoo>
