@@ -1,3 +1,5 @@
+from odoo import models, fields, api, _
+
 class PurchaseRequest(models.Model):
     _name = 'purchase.request'
     _description = 'Solicitud de Compra Interna'
