@@ -4,24 +4,37 @@
             <field name="model">purchase.request</field>
             <field name="arch" type="xml">
                 <form string="Solicitud de Compra">
-                    <header>
-                        <!-- Botón para enviar a aprobación, visible solo en estado Borrador -->
-                        <button name="action_submit" string="Enviar a Aprobación" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                        
-                        <!-- Botones para el Gerente de Compras, visibles solo en estado Para Aprobar -->
-                        <button name="action_approve" string="Aprobar" type="object" class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'to_approve')]}" groups="purchase.group_purchase_manager"/>
-                        <button name="action_reject" string="Rechazar" type="object"
-                                attrs="{'invisible': [('state', '!=', 'to_approve')]}" groups="purchase.group_purchase_manager"/>
-                        
-                        <!-- Botón para restablecer a borrador, visible para el Gerente -->
-                        <button name="action_set_to_draft" string="Restablecer a Borrador" type="object"
-                                attrs="{'invisible': [('state', 'not in', ['approved', 'rejected'])]}" groups="purchase.group_purchase_manager"/>
+<header>
+    <!-- Botón para enviar a aprobación, visible solo en estado Borrador -->
+    <button name="action_submit"
+            string="Enviar a Aprobación"
+            type="object"
+            class="oe_highlight"
+            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+    
+    <!-- Botones para el Gerente de Compras, visibles solo en estado Para Aprobar -->
+    <button name="action_approve"
+            string="Aprobar"
+            type="object"
+            class="oe_highlight"
+            attrs="{'invisible': [('state', '!=', 'to_approve')]}"
+            groups="purchase.group_purchase_manager"/>
+    <button name="action_reject"
+            string="Rechazar"
+            type="object"
+            attrs="{'invisible': [('state', '!=', 'to_approve')]}"
+            groups="purchase.group_purchase_manager"/>
+    
+    <!-- Botón para restablecer a borrador, visible para el Gerente en estados finales -->
+    <button name="action_set_to_draft"
+            string="Restablecer a Borrador"
+            type="object"
+            attrs="{'invisible': [('state', 'not in', ['approved', 'rejected'])]}"
+            groups="purchase.group_purchase_manager"/>
 
-                        <!-- La barra de estado -->
-                        <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,done"/>
-                    </header>
+    <!-- La barra de estado -->
+    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,approved,done"/>
+</header>
                     <sheet>
                         <!-- ... (el resto de tu sheet se mantiene igual: oe_title, group, notebook, etc.) ... -->
                         <div class="oe_title">
