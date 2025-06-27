@@ -2,7 +2,7 @@
 <odoo>
     <data>
 
-        <!-- Vista de Formulario (Form) -->
+        <!-- Vista de Formulario (Form) - Adaptada a Odoo 17 -->
         <record id="purchase_request_form_view" model="ir.ui.view">
             <field name="name">purchase.request.form</field>
             <field name="model">purchase.request</field>
@@ -14,26 +14,26 @@
                                 string="Enviar a Aprobación"
                                 type="object"
                                 class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                                invisible="state != 'draft'"/>
                         
                         <!-- Botones para el Gerente de Compras, visibles solo en estado Para Aprobar -->
                         <button name="action_approve"
                                 string="Aprobar"
                                 type="object"
                                 class="oe_highlight"
-                                attrs="{'invisible': [('state', '!=', 'to_approve')]}"
+                                invisible="state != 'to_approve'"
                                 groups="purchase.group_purchase_manager"/>
                         <button name="action_reject"
                                 string="Rechazar"
                                 type="object"
-                                attrs="{'invisible': [('state', '!=', 'to_approve')]}"
+                                invisible="state != 'to_approve'"
                                 groups="purchase.group_purchase_manager"/>
                         
                         <!-- Botón para restablecer a borrador, visible para el Gerente en estados finales -->
                         <button name="action_set_to_draft"
                                 string="Restablecer a Borrador"
                                 type="object"
-                                attrs="{'invisible': [('state', 'not in', ['approved', 'rejected'])]}"
+                                invisible="state not in ['approved', 'rejected']"
                                 groups="purchase.group_purchase_manager"/>
 
                         <!-- La barra de estado -->
@@ -42,6 +42,7 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
+                                <!-- readonly se sigue usando para campos, pero no para botones -->
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
