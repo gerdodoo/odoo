@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from odoo import models, fields, api, _
-
 class PurchaseRequest(models.Model):
     _name = 'purchase.request'
     _description = 'Solicitud de Compra Interna'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = "id desc"
 
+    # ... (aquí van todos tus campos: name, requester_id, etc.) ...
     name = fields.Char(
         'Referencia', required=True, copy=False, readonly=True,
         default=lambda self: _('Nuevo'), tracking=True
@@ -15,7 +13,6 @@ class PurchaseRequest(models.Model):
         'res.users', string='Solicitante', required=True, index=True,
         default=lambda self: self.env.user, tracking=True
     )
-    # Dejamos el campo editable como solicitaste
     department_id = fields.Many2one(
         'hr.department', string='Departamento Solicitante',
         store=True, index=True, tracking=True
@@ -40,6 +37,19 @@ class PurchaseRequest(models.Model):
         ('rejected', 'Rechazado'),
     ], string='Estado', default='draft', tracking=True)
 
+    # --- MÉTODOS PARA EL FLUJO DE APROBACIÓN ---
+    def action_submit(self):
+        self.write({'state': 'to_approve'})
+
+    def action_approve(self):
+        self.write({'state': 'approved'})
+
+    def action_reject(self):
+        self.write({'state': 'rejected'})
+
+    def action_set_to_draft(self):
+        self.write({'state': 'draft'})
+
     # --- MÉTODO CREATE CON LA LÓGICA DE SECUENCIA ---
     @api.model_create_multi
     def create(self, vals_list):
@@ -48,28 +58,3 @@ class PurchaseRequest(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request.sequence') or _('Nuevo')
         
         return super(PurchaseRequest, self).create(vals_list)
-
-
-class PurchaseRequestLine(models.Model):
-    _name = 'purchase.request.line'
-    _description = 'Línea de Solicitud de Compra'
-
-    request_id = fields.Many2one(
-        'purchase.request', string='Solicitud de Compra', required=True, ondelete='cascade'
-    )
-    product_id = fields.Many2one(
-        'product.product', string='Producto', required=True,
-        domain="[('purchase_ok', '=', True)]"
-    )
-    description = fields.Text('Descripción', required=True)
-    quantity = fields.Float('Cantidad', default=1.0, required=True)
-    product_uom_id = fields.Many2one(
-        'uom.uom', string='Unidad de Medida',
-        related='product_id.uom_po_id'
-    )
-
-    # --- MÉTODO ONCHANGE PARA LA DESCRIPCIÓN ---
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        if self.product_id:
-            self.description = self.product_id.display_name
